@@ -33,6 +33,7 @@ class View{
 		this.id.innerHTML=tabla;
 	}
 
+
 }
 
 class Controlator{
@@ -41,9 +42,34 @@ class Controlator{
 		var name2 = prompt("Type player2 name.");
 		var mod= new Model(name1,name2);
 		var a= new View("table");
+		var that = this;
 		a.build();
-		mod.createEvent();
+		this.createEvent();
 	}
+	createEvent(){
+	var player = true;
+	for (let i=0;i<3;i++){
+		for (let j=0;j<3;j++){
+			this.play(player, i, j);
+			player = !player;
+			}
+		}
+	}
+	
+	play(player1,i,j){
+		//var that=this; para que cuando coja that se vaya al this de la funcion padre
+		//No se llamar a una funcion interna desde dentro de una clase; this.listResult me da fallo
+
+		if(player1){
+			document.getElementById(`${i}.${j}`).addEventListener("click", 
+			function(){document.getElementById(`${i}.${j}`).innerHTML = 
+			"Player1"; that.listResultPlayer1.push(`${i}.${j}`);});
+		}else{
+			document.getElementById(`${i}.${j}`).addEventListener("click", 
+			function(){document.getElementById(`${i}.${j}`).innerHTML = 
+			"player2"; that.listResultPlayer2.push(`${i}.${j}`);});
+	}
+}
 
 }
 
@@ -55,29 +81,7 @@ class Model{
 		this.listResultPlayer1 = new Array();
 		this.listResultPlayer2 = new Array();
 	}
-	createEvent(){
-		var player = true;
-		for (let i=0;i<3;i++){
-			for (let j=0;j<3;j++){
-				this.play(player, i, j);
-				player = !player;
-				}
-			}
-		}
-	
-	play(player1,i,j){
-		//No se llamar a una funcion interna desde dentro de una clase; this.listResult me da fallo
-		
-		if(player1){
-			document.getElementById(`${i}.${j}`).addEventListener("click", 
-			function(){document.getElementById(`${i}.${j}`).innerHTML = 
-			"Player1"; this.listResultPlayer1.push(`${i}.${j}`);});
-		}else{
-			document.getElementById(`${i}.${j}`).addEventListener("click", 
-			function(){document.getElementById(`${i}.${j}`).innerHTML = 
-			"player2"; this.listResultPlayer2.push(`${i}.${j}`);});
-	}
-}
+
 }
 class Player{
 	constructor(nombre){
