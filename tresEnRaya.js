@@ -16,73 +16,101 @@ class View{
 
 	constructor(id){
 		this.id=document.getElementById(id);
-
 	}
-
 	build(){
 		var tabla;
 		tabla = `<table border="0" cellspacing="2" bgcolor="black">`
 		for (var j=0;j<3;j++){
 			tabla +=`<tr height="150">`;
 			for (var i=0;i<3;i++){
-				tabla +=`<td width="150"bgcolor="white" id =${j}.${i}></td>`;
+				tabla +=`<td width="150" bgcolor="white" id =${j}.${i} ></td>`;
 			}
 			tabla +=`</tr>`;
 		}	
 		tabla += `</table>`;
 		this.id.innerHTML=tabla;
 	}
-
-
 }
 
 class Controlator{
 	constructor(){
 		var name1 = prompt("Type player1 name.");
 		var name2 = prompt("Type player2 name.");
-		var mod= new Model(name1,name2);
-		var a= new View("table");
-		var that = this;
-		a.build();
+		this.mod= new Model(name1,name2);
+		this.a= new View("table");
+		this.player = true;
+		this.a.build();
 		this.createEvent();
+
 	}
 	createEvent(){
 	var player = true;
 	for (let i=0;i<3;i++){
 		for (let j=0;j<3;j++){
-			this.play(player, i, j);
-			player = !player;
+			document.getElementById(`${i}.${j}`).addEventListener("click", (e)=>this.ficha(e));
 			}
 		}
 	}
-	
-	play(player1,i,j){
-		//var that=this; para que cuando coja that se vaya al this de la funcion padre
-		//No se llamar a una funcion interna desde dentro de una clase; this.listResult me da fallo
-
-		if(player1){
-			document.getElementById(`${i}.${j}`).addEventListener("click", 
-			function(){document.getElementById(`${i}.${j}`).innerHTML = 
-			"Player1"; that.listResultPlayer1.push(`${i}.${j}`);});
-		}else{
-			document.getElementById(`${i}.${j}`).addEventListener("click", 
-			function(){document.getElementById(`${i}.${j}`).innerHTML = 
-			"player2"; that.listResultPlayer2.push(`${i}.${j}`);});
+	ficha(e){
+			this.mod.save(e, this.player);
+			this.player= !this.player;
 	}
 }
 
-}
 
 class Model{
 	constructor(n1,n2){
 		this.listPlayer = new Array(new Player(n1),new Player(n2));
 		this.listTable = new Array(0.0, 0.1, 0.2, 1.0, 
 			1.1, 1.2, 2.0, 2.1, 2.2);
+		this.listWin = [[0,0,0],[0,0,0],
+						[0,0,0]];
 		this.listResultPlayer1 = new Array();
 		this.listResultPlayer2 = new Array();
 	}
-
+	save(e, bool){
+		if (bool){
+			e.target.innerHTML= "X";
+			this.game(e.target.getAttribute("id"),1);
+		}else{
+			e.target.innerHTML = "O";
+			this.game(e.target.getAttribute("id"),2);
+		}
+	}
+	game(id, x){
+		if (x==1){
+			++this.listWin[parseInt(id[0])][parseInt(id[2])];
+		}else{
+			++this.listWin[parseInt(id[0])][parseInt(id[2])];
+			++this.listWin[parseInt(id[0])][parseInt(id[2])];
+		}
+		this.win(this.listWin);
+	}
+	win(x){
+		if(x[0][0] == 1 && x[0][1] == 1 && x[0][2] == 1 || 
+			x[1][0] == 1 && x[1][1] == 1 && x[1][2] == 1 ||
+			x[2][0] == 1 && x[2][1] == 1 && x[2][2] == 1 || 
+			x[0][0] == 1 && x[1][0] == 1 && x[2][2] == 1 || 
+			x[0][1] == 1 && x[1][1] == 1 && x[2][1] == 1 || 
+			x[0][2] == 1 && x[1][2] == 1 && x[2][2] == 1 || 
+			x[0][0] == 1 && x[1][1] == 1 && x[2][2] == 1 || 
+			x[2][0] == 1 && x[1][1] == 1 && x[0][2] == 1){
+			document.write(`WIN ${this.listPlayer[0].name}!!`)
+		}else if(x[0][0] == 2 && x[0][1] == 2 && x[0][2] == 2 || 
+			x[1][0] == 2 && x[1][1] == 2 && x[1][2] == 2 ||
+			x[2][0] == 2 && x[2][1] == 2 && x[2][2] == 2 || 
+			x[0][0] == 2 && x[1][0] == 2 && x[2][2] == 2 || 
+			x[0][1] == 2 && x[1][1] == 2 && x[2][1] == 2 || 
+			x[0][2] == 2 && x[1][2] == 2 && x[2][2] == 2 || 
+			x[0][0] == 2 && x[1][1] == 2 && x[2][2] == 2 || 
+			x[2][0] == 2 && x[1][1] == 2 && x[0][2] == 2){
+			document.write(`WIN ${this.listPlayer[1].name}!!`)
+			}
+		}
 }
+
+
+
 class Player{
 	constructor(nombre){
 		this.name=nombre;
